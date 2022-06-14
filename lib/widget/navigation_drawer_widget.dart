@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../page/lessons_page.dart';
+
 class NavigationDrawerWidget extends StatelessWidget {
   final padding = EdgeInsets.symmetric(horizontal: 20);
   @override
@@ -71,7 +73,9 @@ class NavigationDrawerWidget extends StatelessWidget {
 
     switch (index) {
       case 0:
-
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => LessonsPage(),
+        ));
         break;
       case 1:
 
