@@ -1,4 +1,4 @@
-# todoapp
+# Extra prof APP mobile for University project
 
 A new Flutter project.
 
