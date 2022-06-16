@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../page/lessons_list.dart';
 import '../page/lessons_page.dart';
+
+import '../page/login_page.dart';
 
 class NavigationDrawerWidget extends StatelessWidget {
   final padding = EdgeInsets.symmetric(horizontal: 20);
@@ -74,11 +77,13 @@ class NavigationDrawerWidget extends StatelessWidget {
     switch (index) {
       case 0:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => LessonsPage(),
+          builder: (context) => LessonsList(),
         ));
         break;
-      case 1:
-
+      case 4:
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => LoginPage(),
+        ));
         break;
     }
   }

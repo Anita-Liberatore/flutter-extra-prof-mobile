@@ -1,52 +1,31 @@
 import 'package:extraprof/page/lessons_page.dart';
 import 'package:flutter/material.dart';
-import 'package:extraprof/widget/navigation_drawer_widget.dart';
-void main() {
-  runApp(const MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+import '../widget/navigation_drawer_widget.dart';
 
-  // This widget is the root of your application.
+void main() => runApp(const LoginPage());
+
+class LoginPage extends StatelessWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
+  static const String _title = 'Login';
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Extra prof',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      title: _title,
+      home: Scaffold(
+        drawer: NavigationDrawerWidget(),
+        appBar: AppBar(
+          backgroundColor: Color.fromRGBO(50, 75, 205, 1),
+          centerTitle: true,
+          title: Text("Effettua il login"),
+        ),
+        body: const MyStatefulWidget(),
       ),
-      home: const MyHomePage(title: 'Extra prof booking lessons'),
     );
   }
 }
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: NavigationDrawerWidget(),
-      appBar: AppBar(
-        backgroundColor: Color.fromRGBO(50, 75, 205, 1),
-        centerTitle: true,
-        title: Text(widget.title),
-      ),
-      body: const MyStatefulWidget(),
-
-    );
-  }
-}
-
 
 class MyStatefulWidget extends StatefulWidget {
   const MyStatefulWidget({Key? key}) : super(key: key);
@@ -69,7 +48,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(10),
                 child: const Text(
-                  'Entra in app',
+                  'Sign in',
                   style: TextStyle(fontSize: 20),
                 )),
             Container(
@@ -106,10 +85,10 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                       builder: (context) => LessonsPage(),
                     ));
                   },
+
                 )
             ),
           ],
         ));
   }
 }
-

@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class LessonsPage extends StatefulWidget {
+class LessonsList extends StatefulWidget {
   @override
   _IndexPageState createState() => _IndexPageState();
 }
 
-class _IndexPageState extends State<LessonsPage> {
+class _IndexPageState extends State<LessonsList> {
   List courses = [];
   bool isLoading = false;
   @override
@@ -22,9 +22,9 @@ class _IndexPageState extends State<LessonsPage> {
     });
     var url = "http://10.0.2.2:8080/backend-unito-extraprof/courses";
     var response = await http.get(Uri.parse(url),  headers: {'Content-Type': 'application/json; charset=UTF-8',
-    'Accept': "*/*",
-    'connection': 'keep-alive',
-    'Accept-Encoding' : 'gzip, deflate, br'});
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding' : 'gzip, deflate, br'});
     if(response.statusCode == 200){
       var items = jsonDecode(response.body);
       setState(() {
@@ -64,10 +64,10 @@ class _IndexPageState extends State<LessonsPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                    new GestureDetector(
+                  new GestureDetector(
                     onTap: () {
-                      print("ok");
-                      },
+
+                    },
                     child: new Text(courseName),
                   )
                 ],
