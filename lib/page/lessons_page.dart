@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:extraprof/page/booking_lessons.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -66,7 +67,9 @@ class _IndexPageState extends State<LessonsPage> {
                 children: <Widget>[
                     new GestureDetector(
                     onTap: () {
-                      print("ok");
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => BookingLessons(),
+                      ));
                       },
                     child: new Text(courseName),
                   )

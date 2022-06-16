@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../widget/navigation_drawer_widget.dart';
+
 class LessonsList extends StatefulWidget {
   @override
   _IndexPageState createState() => _IndexPageState();
@@ -37,8 +39,9 @@ class _IndexPageState extends State<LessonsList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: NavigationDrawerWidget(),
       appBar: AppBar(
-        title: Text("Seleziona un corso"),
+        title: Text("Lista dei nostri corsi disponibili"),
       ),
       body: getBody(),
     );
