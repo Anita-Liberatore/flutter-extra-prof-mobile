@@ -13,6 +13,7 @@ class LessonsList extends StatefulWidget {
 class _IndexPageState extends State<LessonsList> {
   List courses = [];
   bool isLoading = false;
+
   @override
   void initState() {
     super.initState();

@@ -1,10 +1,14 @@
 import 'dart:convert';
 
 import 'package:extraprof/page/booking_lessons.dart';
+import 'package:extraprof/widget/navigation_drawer_after_login.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class LessonsPage extends StatefulWidget {
+  final String loginName;
+  LessonsPage(this.loginName);
+
   @override
   _IndexPageState createState() => _IndexPageState();
 }
@@ -12,6 +16,8 @@ class LessonsPage extends StatefulWidget {
 class _IndexPageState extends State<LessonsPage> {
   List courses = [];
   bool isLoading = false;
+
+  get loginName => this.widget.loginName;
   @override
   void initState() {
     super.initState();
@@ -38,6 +44,7 @@ class _IndexPageState extends State<LessonsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: NavigationDrawerAfterLoginWidget(),
       appBar: AppBar(
         title: Text("Seleziona un corso"),
       ),
@@ -54,6 +61,7 @@ class _IndexPageState extends State<LessonsPage> {
   }
   Widget getCard(item){
     var courseName = item['courseName'];
+    var courseId = item['id'];
     return Card(
       elevation: 1.5,
       child: Padding(
@@ -68,7 +76,7 @@ class _IndexPageState extends State<LessonsPage> {
                     new GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => BookingLessons(),
+                        builder: (context) => BookingLessons(loginName, courseId),
                       ));
                       },
                     child: new Text(courseName),

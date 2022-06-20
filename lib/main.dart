@@ -103,7 +103,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                     print(nameController.text);
                     print(passwordController.text);
                     Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => LessonsPage(),
+                      builder: (context) => LessonsPage(nameController.text),
                     ));
                   },
                 )

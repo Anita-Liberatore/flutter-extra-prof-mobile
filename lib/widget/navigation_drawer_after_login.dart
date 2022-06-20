@@ -1,11 +1,13 @@
+import 'package:extraprof/main.dart';
 import 'package:flutter/material.dart';
 
+import '../page/dashboard_page.dart';
 import '../page/lessons_list.dart';
 import '../page/lessons_page.dart';
 
 import '../page/login_page.dart';
 
-class NavigationDrawerWidget extends StatelessWidget {
+class NavigationDrawerAfterLoginWidget extends StatelessWidget {
   final padding = EdgeInsets.symmetric(horizontal: 20);
   @override
   Widget build(BuildContext context) {
@@ -20,23 +22,21 @@ class NavigationDrawerWidget extends StatelessWidget {
                 children: [
                   const SizedBox(height: 24),
                   buildMenuItem(
-                    text: 'Lezioni',
-                    icon: Icons.playlist_add_check,
+                    text: 'Dashboard',
+                    icon: Icons.dashboard,
                     onClicked: () => selectedItem(context, 0),
+                  ),
+                  const SizedBox(height: 24),
+                  buildMenuItem(
+                    text: 'Prenota Lezioni',
+                    icon: Icons.date_range_rounded,
+                    onClicked: () => selectedItem(context, 1),
                   ),
                   const SizedBox(height: 16),
                   buildMenuItem(
-                    text: 'Professori',
+                    text: 'Logout',
                     icon: Icons.recent_actors_outlined ,
-                    onClicked: () => selectedItem(context, 1),
-                  ),
-                  const SizedBox(height: 24),
-                  Divider(color: Colors.white70),
-                  const SizedBox(height: 24),
-                  buildMenuItem(
-                    text: 'Login',
-                    icon: Icons.login,
-                    onClicked: () => selectedItem(context, 4),
+                    onClicked: () => selectedItem(context, 2),
                   ),
 
                 ],
@@ -72,14 +72,23 @@ class NavigationDrawerWidget extends StatelessWidget {
     switch (index) {
       case 0:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => LessonsList(),
+          builder: (context) => DashboardPage(),
         ));
         break;
-      case 4:
+
+      case 1:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => LoginPage(),
+          builder: (context) => LessonsPage(""),
         ));
         break;
+
+      case 2:
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => MyHomePage(title: "Entra in app"),
+        ));
+        break;
+
+       
     }
   }
 }
