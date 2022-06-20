@@ -9,6 +9,10 @@ import '../page/login_page.dart';
 
 class NavigationDrawerAfterLoginWidget extends StatelessWidget {
   final padding = EdgeInsets.symmetric(horizontal: 20);
+
+  String loginName;
+  NavigationDrawerAfterLoginWidget(this.loginName);
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -72,13 +76,13 @@ class NavigationDrawerAfterLoginWidget extends StatelessWidget {
     switch (index) {
       case 0:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => DashboardPage(),
+          builder: (context) => DashboardPage(loginName),
         ));
         break;
 
       case 1:
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => LessonsPage(""),
+          builder: (context) => LessonsPage(loginName),
         ));
         break;
 

@@ -44,7 +44,7 @@ class _IndexPageState extends State<LessonsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: NavigationDrawerAfterLoginWidget(),
+      drawer: NavigationDrawerAfterLoginWidget(loginName),
       appBar: AppBar(
         title: Text("Seleziona un corso"),
       ),

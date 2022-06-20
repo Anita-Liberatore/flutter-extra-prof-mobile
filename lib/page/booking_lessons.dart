@@ -34,7 +34,7 @@ class MyStatelessWidget extends StatelessWidget {
       initialIndex: 1,
       length: 5,
       child: Scaffold(
-        drawer: NavigationDrawerAfterLoginWidget(),
+        drawer: NavigationDrawerAfterLoginWidget(this.loginName),
         appBar: AppBar(
           title: const Text('Prenota una lezione'),
           bottom: const TabBar(
