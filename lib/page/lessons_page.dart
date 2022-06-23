@@ -76,7 +76,7 @@ class _IndexPageState extends State<LessonsPage> {
                     new GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => BookingLessons(loginName, courseId),
+                        builder: (context) => BookingLessons(loginName, courseId, 0, ""),
                       ));
                       },
                     child: new Text(courseName),

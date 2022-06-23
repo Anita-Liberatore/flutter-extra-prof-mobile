@@ -11,7 +11,7 @@ class NavigationDrawerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: Material(
-        color: Color.fromRGBO(50, 75, 205, 1),
+        color: Colors.blue,
         child: ListView(
           children: <Widget>[
             Container(
@@ -23,12 +23,6 @@ class NavigationDrawerWidget extends StatelessWidget {
                     text: 'Lezioni',
                     icon: Icons.playlist_add_check,
                     onClicked: () => selectedItem(context, 0),
-                  ),
-                  const SizedBox(height: 16),
-                  buildMenuItem(
-                    text: 'Professori',
-                    icon: Icons.recent_actors_outlined ,
-                    onClicked: () => selectedItem(context, 1),
                   ),
                   const SizedBox(height: 24),
                   Divider(color: Colors.white70),

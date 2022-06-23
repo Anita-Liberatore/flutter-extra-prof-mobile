@@ -17,7 +17,7 @@ class LoginPage extends StatelessWidget {
       home: Scaffold(
         drawer: NavigationDrawerWidget(),
         appBar: AppBar(
-          backgroundColor: Color.fromRGBO(50, 75, 205, 1),
+          backgroundColor: Colors.blue,
           centerTitle: true,
           title: Text("Effettua il login"),
         ),

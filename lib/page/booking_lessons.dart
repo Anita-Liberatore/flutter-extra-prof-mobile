@@ -1,12 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import '../widget/navigation_drawer_after_login.dart';
+import 'package:http/http.dart' as http;
+
 
 
 class BookingLessons extends StatefulWidget {
   String loginName;
   int courseId;
-  BookingLessons(this.loginName, this.courseId);
+  int idProfessor;
+  String hour;
+  BookingLessons(this.loginName, this.courseId, this.idProfessor, this.hour);
 
 @override
     _IndexPageState createState() => _IndexPageState();
@@ -14,11 +20,13 @@ class BookingLessons extends StatefulWidget {
 class _IndexPageState extends State<BookingLessons> {
   get loginName => this.widget.loginName;
   get courseId => this.widget.courseId;
+  get idProfessor => this.widget.idProfessor;
+  get hour => this.widget.hour;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: MyStatelessWidget(loginName: loginName, courseId: courseId),
+      home: MyStatelessWidget(loginName: loginName, courseId: courseId, idProfessor: idProfessor,hour: hour),
     );
   }
 }
@@ -26,7 +34,9 @@ class _IndexPageState extends State<BookingLessons> {
 class MyStatelessWidget extends StatelessWidget {
   final String loginName;
   final int courseId;
-  const MyStatelessWidget({Key? key, required this.loginName, required this.courseId}) : super(key: key);
+  final int idProfessor;
+  final String hour;
+  const MyStatelessWidget({Key? key, required this.loginName, required this.courseId, required this.idProfessor, required this.hour}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,13 +50,13 @@ class MyStatelessWidget extends StatelessWidget {
           bottom: const TabBar(
             tabs: <Widget>[
               Tab(
-                  child: Text('Lunedì', style: TextStyle(color: Colors.white, fontSize: 11),)
+                  child: Text('Lunedì', style: TextStyle(color: Colors.white, fontSize: 10),)
               ),
               Tab(
-                  child: Text('Martedì', style: TextStyle(color: Colors.white, fontSize: 11),)
+                  child: Text('Martedì', style: TextStyle(color: Colors.white, fontSize: 10),)
               ),
               Tab(
-                  child: Text('Mercoledì', style: TextStyle(color: Colors.white, fontSize: 11),)
+                  child: Text('Mercoledì', style: TextStyle(color: Colors.white, fontSize: 10),)
               ),
               Tab(
                   child: Text('Giovedì', style: TextStyle(color: Colors.white, fontSize: 11),)
@@ -59,11 +69,11 @@ class MyStatelessWidget extends StatelessWidget {
         ),
         body: TabBarView(
           children: <Widget>[
-            HomePageL(loginName, courseId),
-            HomePage(loginName),
-            HomePage(loginName),
-            HomePage(loginName),
-            HomePage(loginName),
+            HomePageL(loginName, courseId, idProfessor, hour),
+            HomePageM(loginName, courseId, idProfessor, hour),
+            HomePageME(loginName, courseId, idProfessor, hour),
+            HomePageG(loginName, courseId, idProfessor, hour),
+            HomePageV(loginName, courseId, idProfessor, hour),
           ],
         ),
       ),
@@ -71,96 +81,93 @@ class MyStatelessWidget extends StatelessWidget {
   }
 }
 
-class HomePage extends StatefulWidget {
-
-  final String loginName;
-
-  HomePage(this.loginName);
-
-  @override
-  _IndexPage2State createState() => _IndexPage2State();
-}
-class _IndexPage2State extends State<HomePage> {
-
-  List courses = [
-    {"courseName": "ok"}
-  ];
-
-
-
-  @override
-  void initState() {
-    super.initState();
-    //this.fetchCourse();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Prenota una lezione"),
-      ),
-      body: getBody(),
-    );
-  }
-  Widget getBody(){
-
-    return ListView.builder(
-        itemCount: 1,
-        itemBuilder: (context,index){
-          return getCard(courses[index]);
-        });
-  }
-  Widget getCard(item){
-    var courseName = item['courseName'];
-    return Card(
-      elevation: 1.5,
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: ListTile(
-          title: Row(
-            children: <Widget>[
-              SizedBox(width: 20,),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  new GestureDetector(
-                    onTap: () {
-
-                    },
-                    child: new Text(courseName),
-                  )
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class HomePageL extends StatefulWidget {
 
   final String loginName;
   final int courseId;
-  HomePageL(this.loginName, this.courseId);
+  final int idProfessor;
+  final String hour;
+  HomePageL(this.loginName, this.courseId, this.idProfessor, this.hour);
 
   @override
-  _IndexPage3State createState() => _IndexPage3State();
+  _IndexPage3State createState() => _IndexPage3State(courseId, idProfessor, loginName, hour);
 }
 class _IndexPage3State extends State<HomePageL> {
+  int courseId;
+  String loginName;
+  int idProfessor;
+  String hour;
+  List repetitionsLessons = [];
+  bool isLoading = false;
+  List repetitionsByHour = [];
 
-  List courses = [
-    {"courseName": "L"}
-  ];
+  _IndexPage3State(this.courseId, this.idProfessor, this.loginName, this.hour);
 
 
+  fetchRepetitionsByDayAndCourseId(courseId) async {
+    setState(() {
+      isLoading = true;
+    });
+
+
+    var url = "http://10.0.2.2:8080/backend-unito-extraprof/professors-course-mobile?";
+
+    Map<String, String> qParams = {
+      'id': courseId.toString(),
+      'day': 'L'
+    };
+
+    Uri uri = Uri.parse(url);
+    final finalUri = uri.replace(queryParameters: qParams);
+    var response = await http.get(finalUri,  headers: {'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding' : 'gzip, deflate, br'});
+    if(response.statusCode == 200){
+      var items = jsonDecode(response.body);
+      setState(() {
+        repetitionsLessons = items;
+      });
+    }else{
+      repetitionsLessons = [];
+    }
+  }
+
+  prenota(idProfessor, loginName, courseId, hour) async {
+    print(idProfessor);
+    print(loginName);
+    print(courseId);
+    print(hour);
+
+    var url = "http://10.0.2.2:8080/backend-unito-extraprof/add-repetitions";
+
+
+    var response = await http.post( Uri.parse(url),  headers: {'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding' : 'gzip, deflate, br'},
+
+      body: jsonEncode(<String, Object>{
+        'idProfessor': idProfessor,
+        'idCourse': courseId,
+        'day': 'L',
+        'hour': hour,
+        'status': 'P',
+        'user': loginName
+      }),
+
+    );
+
+    this.fetchRepetitionsByDayAndCourseId(courseId);
+  }
 
   @override
   void initState() {
     super.initState();
-    //this.fetchCourse();
+    this.fetchRepetitionsByDayAndCourseId(this.widget.courseId);
+    this.prenota(this.idProfessor, this.loginName, this.courseId, this.hour);
+
   }
 
   @override
@@ -175,13 +182,17 @@ class _IndexPage3State extends State<HomePageL> {
   Widget getBody(){
 
     return ListView.builder(
-        itemCount: 1,
+        itemCount: repetitionsLessons.length,
         itemBuilder: (context,index){
-          return getCard(courses[index]);
+          return getCard(repetitionsLessons[index]);
         });
   }
   Widget getCard(item){
-    var courseName = item['courseName'];
+    final ButtonStyle style =
+    ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 15));
+    var nameProfessor = item['nameProfessor'];
+    var hour = item['hour'];
+    var idProfessor = item['id'];
     return Card(
       elevation: 1.5,
       child: Padding(
@@ -193,12 +204,15 @@ class _IndexPage3State extends State<HomePageL> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  new GestureDetector(
-                    onTap: () {
-
+                  new Text(nameProfessor + " - Orario: " +hour),
+                  const SizedBox(height: 25),
+                  ElevatedButton(
+                    style: style,
+                    onPressed: () {
+                      prenota(idProfessor, this.widget.loginName, this.widget.courseId, hour);
                     },
-                    child: new Text(courseName),
-                  )
+                    child: const Text('Prenota lezione'),
+                  ),
                 ],
               )
             ],
@@ -208,3 +222,568 @@ class _IndexPage3State extends State<HomePageL> {
     );
   }
 }
+
+class HomePageM extends StatefulWidget {
+
+  final String loginName;
+  final int courseId;
+  final int idProfessor;
+  final String hour;
+  HomePageM(this.loginName, this.courseId, this.idProfessor, this.hour);
+
+  @override
+  _IndexPage4State createState() => _IndexPage4State(courseId, idProfessor, loginName, hour);
+}
+class _IndexPage4State extends State<HomePageM> {
+  int courseId;
+  String loginName;
+  int idProfessor;
+  String hour;
+  List repetitionsLessons = [];
+  bool isLoading = false;
+  List repetitionsByHour = [];
+
+  _IndexPage4State(this.courseId, this.idProfessor, this.loginName, this.hour);
+
+
+  fetchRepetitionsByDayAndCourseId(courseId) async {
+    setState(() {
+      isLoading = true;
+    });
+
+
+    var url = "http://10.0.2.2:8080/backend-unito-extraprof/professors-course-mobile?";
+
+    Map<String, String> qParams = {
+      'id': courseId.toString(),
+      'day': 'M'
+    };
+
+    Uri uri = Uri.parse(url);
+    final finalUri = uri.replace(queryParameters: qParams);
+    var response = await http.get(finalUri,  headers: {'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding' : 'gzip, deflate, br'});
+    if(response.statusCode == 200){
+      var items = jsonDecode(response.body);
+      setState(() {
+        repetitionsLessons = items;
+      });
+    }else{
+      repetitionsLessons = [];
+    }
+  }
+
+  prenota(idProfessor, loginName, courseId, hour) async {
+    print(idProfessor);
+    print(loginName);
+    print(courseId);
+    print(hour);
+
+    var url = "http://10.0.2.2:8080/backend-unito-extraprof/add-repetitions";
+
+
+    var response = await http.post( Uri.parse(url),  headers: {'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding' : 'gzip, deflate, br'},
+
+      body: jsonEncode(<String, Object>{
+        'idProfessor': idProfessor,
+        'idCourse': courseId,
+        'day': 'M',
+        'hour': hour,
+        'status': 'P',
+        'user': loginName
+      }),
+
+    );
+
+    this.fetchRepetitionsByDayAndCourseId(courseId);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    this.fetchRepetitionsByDayAndCourseId(this.widget.courseId);
+    this.prenota(this.idProfessor, this.loginName, this.courseId, this.hour);
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Prenota una lezione"),
+      ),
+      body: getBody(),
+    );
+  }
+  Widget getBody(){
+
+    return ListView.builder(
+        itemCount: repetitionsLessons.length,
+        itemBuilder: (context,index){
+          return getCard(repetitionsLessons[index]);
+        });
+  }
+  Widget getCard(item){
+    final ButtonStyle style =
+    ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 15));
+    var nameProfessor = item['nameProfessor'];
+    var hour = item['hour'];
+    var idProfessor = item['id'];
+    return Card(
+      elevation: 1.5,
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: ListTile(
+          title: Row(
+            children: <Widget>[
+              SizedBox(width: 20,),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  new Text(nameProfessor + " - Orario: " +hour),
+                  const SizedBox(height: 25),
+                  ElevatedButton(
+                    style: style,
+                    onPressed: () {
+                      prenota(idProfessor, this.widget.loginName, this.widget.courseId, hour);
+                    },
+                    child: const Text('Prenota lezione'),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class HomePageME extends StatefulWidget {
+
+  final String loginName;
+  final int courseId;
+  final int idProfessor;
+  final String hour;
+  HomePageME(this.loginName, this.courseId, this.idProfessor, this.hour);
+
+  @override
+  _IndexPage5State createState() => _IndexPage5State(courseId, idProfessor, loginName, hour);
+}
+class _IndexPage5State extends State<HomePageME> {
+  int courseId;
+  String loginName;
+  int idProfessor;
+  String hour;
+  List repetitionsLessons = [];
+  bool isLoading = false;
+  List repetitionsByHour = [];
+
+  _IndexPage5State(this.courseId, this.idProfessor, this.loginName, this.hour);
+
+
+  fetchRepetitionsByDayAndCourseId(courseId) async {
+    setState(() {
+      isLoading = true;
+    });
+
+
+    var url = "http://10.0.2.2:8080/backend-unito-extraprof/professors-course-mobile?";
+
+    Map<String, String> qParams = {
+      'id': courseId.toString(),
+      'day': 'ME'
+    };
+
+    Uri uri = Uri.parse(url);
+    final finalUri = uri.replace(queryParameters: qParams);
+    var response = await http.get(finalUri,  headers: {'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding' : 'gzip, deflate, br'});
+    if(response.statusCode == 200){
+      var items = jsonDecode(response.body);
+      setState(() {
+        repetitionsLessons = items;
+      });
+    }else{
+      repetitionsLessons = [];
+    }
+  }
+
+  prenota(idProfessor, loginName, courseId, hour) async {
+    print(idProfessor);
+    print(loginName);
+    print(courseId);
+    print(hour);
+
+    var url = "http://10.0.2.2:8080/backend-unito-extraprof/add-repetitions";
+
+
+    var response = await http.post( Uri.parse(url),  headers: {'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding' : 'gzip, deflate, br'},
+
+      body: jsonEncode(<String, Object>{
+        'idProfessor': idProfessor,
+        'idCourse': courseId,
+        'day': 'ME',
+        'hour': hour,
+        'status': 'P',
+        'user': loginName
+      }),
+
+    );
+
+    this.fetchRepetitionsByDayAndCourseId(courseId);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    this.fetchRepetitionsByDayAndCourseId(this.widget.courseId);
+    this.prenota(this.idProfessor, this.loginName, this.courseId, this.hour);
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Prenota una lezione"),
+      ),
+      body: getBody(),
+    );
+  }
+  Widget getBody(){
+
+    return ListView.builder(
+        itemCount: repetitionsLessons.length,
+        itemBuilder: (context,index){
+          return getCard(repetitionsLessons[index]);
+        });
+  }
+  Widget getCard(item){
+    final ButtonStyle style =
+    ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 15));
+    var nameProfessor = item['nameProfessor'];
+    var hour = item['hour'];
+    var idProfessor = item['id'];
+    return Card(
+      elevation: 1.5,
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: ListTile(
+          title: Row(
+            children: <Widget>[
+              SizedBox(width: 20,),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  new Text(nameProfessor + " - Orario: " +hour),
+                  const SizedBox(height: 25),
+                  ElevatedButton(
+                    style: style,
+                    onPressed: () {
+                      prenota(idProfessor, this.widget.loginName, this.widget.courseId, hour);
+                    },
+                    child: const Text('Prenota lezione'),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class HomePageG extends StatefulWidget {
+
+  final String loginName;
+  final int courseId;
+  final int idProfessor;
+  final String hour;
+  HomePageG(this.loginName, this.courseId, this.idProfessor, this.hour);
+
+  @override
+  _IndexPage6State createState() => _IndexPage6State(courseId, idProfessor, loginName, hour);
+}
+class _IndexPage6State extends State<HomePageG> {
+  int courseId;
+  String loginName;
+  int idProfessor;
+  String hour;
+  List repetitionsLessons = [];
+  bool isLoading = false;
+  List repetitionsByHour = [];
+
+  _IndexPage6State(this.courseId, this.idProfessor, this.loginName, this.hour);
+
+
+  fetchRepetitionsByDayAndCourseId(courseId) async {
+    setState(() {
+      isLoading = true;
+    });
+
+
+    var url = "http://10.0.2.2:8080/backend-unito-extraprof/professors-course-mobile?";
+
+    Map<String, String> qParams = {
+      'id': courseId.toString(),
+      'day': 'G'
+    };
+
+    Uri uri = Uri.parse(url);
+    final finalUri = uri.replace(queryParameters: qParams);
+    var response = await http.get(finalUri,  headers: {'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding' : 'gzip, deflate, br'});
+    if(response.statusCode == 200){
+      var items = jsonDecode(response.body);
+      setState(() {
+        repetitionsLessons = items;
+      });
+    }else{
+      repetitionsLessons = [];
+    }
+  }
+
+  prenota(idProfessor, loginName, courseId, hour) async {
+    print(idProfessor);
+    print(loginName);
+    print(courseId);
+    print(hour);
+
+    var url = "http://10.0.2.2:8080/backend-unito-extraprof/add-repetitions";
+
+
+    var response = await http.post( Uri.parse(url),  headers: {'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding' : 'gzip, deflate, br'},
+
+      body: jsonEncode(<String, Object>{
+        'idProfessor': idProfessor,
+        'idCourse': courseId,
+        'day': 'G',
+        'hour': hour,
+        'status': 'P',
+        'user': loginName
+      }),
+
+    );
+
+    this.fetchRepetitionsByDayAndCourseId(courseId);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    this.fetchRepetitionsByDayAndCourseId(this.widget.courseId);
+    this.prenota(this.idProfessor, this.loginName, this.courseId, this.hour);
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Prenota una lezione"),
+      ),
+      body: getBody(),
+    );
+  }
+  Widget getBody(){
+
+    return ListView.builder(
+        itemCount: repetitionsLessons.length,
+        itemBuilder: (context,index){
+          return getCard(repetitionsLessons[index]);
+        });
+  }
+  Widget getCard(item){
+    final ButtonStyle style =
+    ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 15));
+    var nameProfessor = item['nameProfessor'];
+    var hour = item['hour'];
+    var idProfessor = item['id'];
+    return Card(
+      elevation: 1.5,
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: ListTile(
+          title: Row(
+            children: <Widget>[
+              SizedBox(width: 20,),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  new Text(nameProfessor + " - Orario: " +hour),
+                  const SizedBox(height: 25),
+                  ElevatedButton(
+                    style: style,
+                    onPressed: () {
+                      prenota(idProfessor, this.widget.loginName, this.widget.courseId, hour);
+                    },
+                    child: const Text('Prenota lezione'),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class HomePageV extends StatefulWidget {
+
+  final String loginName;
+  final int courseId;
+  final int idProfessor;
+  final String hour;
+  HomePageV(this.loginName, this.courseId, this.idProfessor, this.hour);
+
+  @override
+  _IndexPage7State createState() => _IndexPage7State(courseId, idProfessor, loginName, hour);
+}
+class _IndexPage7State extends State<HomePageV> {
+  int courseId;
+  String loginName;
+  int idProfessor;
+  String hour;
+  List repetitionsLessons = [];
+  bool isLoading = false;
+  List repetitionsByHour = [];
+
+  _IndexPage7State(this.courseId, this.idProfessor, this.loginName, this.hour);
+
+
+  fetchRepetitionsByDayAndCourseId(courseId) async {
+    setState(() {
+      isLoading = true;
+    });
+
+
+    var url = "http://10.0.2.2:8080/backend-unito-extraprof/professors-course-mobile?";
+
+    Map<String, String> qParams = {
+      'id': courseId.toString(),
+      'day': 'V'
+    };
+
+    Uri uri = Uri.parse(url);
+    final finalUri = uri.replace(queryParameters: qParams);
+    var response = await http.get(finalUri,  headers: {'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding' : 'gzip, deflate, br'});
+    if(response.statusCode == 200){
+      var items = jsonDecode(response.body);
+      setState(() {
+        repetitionsLessons = items;
+      });
+    }else{
+      repetitionsLessons = [];
+    }
+  }
+
+  prenota(idProfessor, loginName, courseId, hour) async {
+    print(idProfessor);
+    print(loginName);
+    print(courseId);
+    print(hour);
+
+    var url = "http://10.0.2.2:8080/backend-unito-extraprof/add-repetitions";
+
+
+    var response = await http.post( Uri.parse(url),  headers: {'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': "*/*",
+      'connection': 'keep-alive',
+      'Accept-Encoding' : 'gzip, deflate, br'},
+
+      body: jsonEncode(<String, Object>{
+        'idProfessor': idProfessor,
+        'idCourse': courseId,
+        'day': 'V',
+        'hour': hour,
+        'status': 'P',
+        'user': loginName
+      }),
+
+    );
+
+    this.fetchRepetitionsByDayAndCourseId(courseId);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    this.fetchRepetitionsByDayAndCourseId(this.widget.courseId);
+    this.prenota(this.idProfessor, this.loginName, this.courseId, this.hour);
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Prenota una lezione"),
+      ),
+      body: getBody(),
+    );
+  }
+  Widget getBody(){
+
+    return ListView.builder(
+        itemCount: repetitionsLessons.length,
+        itemBuilder: (context,index){
+          return getCard(repetitionsLessons[index]);
+        });
+  }
+  Widget getCard(item){
+    final ButtonStyle style =
+    ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 15));
+    var nameProfessor = item['nameProfessor'];
+    var hour = item['hour'];
+    var idProfessor = item['id'];
+    return Card(
+      elevation: 1.5,
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: ListTile(
+          title: Row(
+            children: <Widget>[
+              SizedBox(width: 20,),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  new Text(nameProfessor + " - Orario: " +hour),
+                  const SizedBox(height: 25),
+                  ElevatedButton(
+                    style: style,
+                    onPressed: () {
+                      prenota(idProfessor, this.widget.loginName, this.widget.courseId, hour);
+                    },
+                    child: const Text('Prenota lezione'),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+

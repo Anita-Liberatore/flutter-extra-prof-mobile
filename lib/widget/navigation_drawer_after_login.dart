@@ -17,7 +17,7 @@ class NavigationDrawerAfterLoginWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: Material(
-        color: Color.fromRGBO(50, 75, 205, 1),
+        color: Colors.blue,
         child: ListView(
           children: <Widget>[
             Container(
