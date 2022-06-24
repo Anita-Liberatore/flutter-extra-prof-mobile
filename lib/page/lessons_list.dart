@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../widget/navigation_drawer_widget.dart';
+import 'lessons_no_booking.dart';
 
 class LessonsList extends StatefulWidget {
   @override
@@ -57,6 +58,7 @@ class _IndexPageState extends State<LessonsList> {
   }
   Widget getCard(item){
     var courseName = item['courseName'];
+    var id = item['id'];
     return Card(
       elevation: 1.5,
       child: Padding(
@@ -70,7 +72,9 @@ class _IndexPageState extends State<LessonsList> {
                 children: <Widget>[
                   new GestureDetector(
                     onTap: () {
-
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => LessonsNoBooking("", id,0, ""),
+                      ));
                     },
                     child: new Text(courseName),
                   )
