@@ -4,6 +4,8 @@ A new Flutter project about university project.
 
 Project is booking lessons and crud operations on it!
 
+![Alt text](./lib/images/one.png)
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
