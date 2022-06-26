@@ -1,6 +1,8 @@
 # Extra prof APP mobile for University project
 
-A new Flutter project.
+A new Flutter project about university project.
+
+Project is booking lessons and crud operations on it!
 
 ## Getting Started
 
